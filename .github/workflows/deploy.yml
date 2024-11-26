@@ -29,7 +29,7 @@ jobs:
           ssh -o StrictHostKeyChecking=no ec2-user@54.88.130.216 << 'EOF'
             cd /var/www/html
             git pull origin main  # Actualizar los archivos del repositorio
-            sudo systemctl restart nginx  # Reiniciar Nginx
+            sudo systemctl restart httpd  # Reiniciar Apache HTTPD
           EOF
 
       # Paso 4: Desplegar los archivos a la segunda instancia EC2
@@ -38,5 +38,5 @@ jobs:
           ssh -o StrictHostKeyChecking=no ec2-user@34.207.92.31 << 'EOF'
             cd /var/www/html
             git pull origin main  # Actualizar los archivos del repositorio
-            sudo systemctl restart nginx  # Reiniciar Nginx
+            sudo systemctl restart httpd  # Reiniciar Apache HTTPD
           EOF
