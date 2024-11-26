@@ -10,25 +10,33 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout Code
-      uses: actions/checkout@v3
+      # Paso 1: Hacer checkout del repositorio
+      - name: Checkout repository
+        uses: actions/checkout@v2
 
-    - name: Deploy to Instance 1
-      uses: appleboy/ssh-action@v0.1.4
-      with:
-        host: 54.88.130.216
-        username: ec2-user
-        key: ${{ secrets.HTML_BALANCER }}
-        script: |
-          cd /var/www/html
-          git pull
+      # Paso 2: Configurar la clave SSH para conectar con las instancias EC2
+      - name: Set up SSH key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.HTML_BALANCER }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H 54.88.130.216 >> ~/.ssh/known_hosts
+          ssh-keyscan -H 34.207.92.31 >> ~/.ssh/known_hosts
 
-    - name: Deploy to Instance 2
-      uses: appleboy/ssh-action@v0.1.4
-      with:
-        host: 34.207.92.31
-        username: ec2-user
-        key: ${{ secrets.HTML_BALANCER }}
-        script: |
-          cd /var/www/html
-          git pull
+      # Paso 3: Desplegar los archivos a la primera instancia EC2
+      - name: Deploy to Instance 1
+        run: |
+          ssh -o StrictHostKeyChecking=no ec2-user@54.88.130.216 << 'EOF'
+            cd /var/www/html
+            git pull origin main  # Actualizar los archivos del repositorio
+            sudo systemctl restart nginx  # Reiniciar Nginx
+          EOF
+
+      # Paso 4: Desplegar los archivos a la segunda instancia EC2
+      - name: Deploy to Instance 2
+        run: |
+          ssh -o StrictHostKeyChecking=no ec2-user@34.207.92.31 << 'EOF'
+            cd /var/www/html
+            git pull origin main  # Actualizar los archivos del repositorio
+            sudo systemctl restart nginx  # Reiniciar Nginx
+          EOF
