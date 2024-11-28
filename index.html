@@ -8,11 +8,11 @@
 </head>
 <body>
     <h1>¡Hello world from HTML, Lesly Salas SI08! Prueba 3</h1>
+ <p>Nombre de host: <span id="hostname"></span></p>
+
+  <script>
+    var hostname = window.location.hostname;
+    document.getElementById("hostname").innerHTML = hostname;
+  </script>
 </body>
 </html>
-
-<?php
-//Mostrar el nombre host
-$hostname = gethostname();
-echo "<h1>Host: $hostname</h1>";
-?>
